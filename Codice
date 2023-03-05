@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace CollettaApp {
+    public partial class MainForm : Form {
+        private List<Participant> participants = new List<Participant>();
+
+        public MainForm() {
+            InitializeComponent();
+        }
+
+        private void addParticipantButton_Click(object sender, EventArgs e) {
+            string nameToAdd = nameTextBox.Text;
+            double amountToAdd;
+            if (double.TryParse(amountTextBox.Text, out amountToAdd)) {
+                participants.Add(new Participant { Name = nameToAdd, Contribution = amountToAdd });
+                UpdateParticipantsList();
+                UpdateTotalContribution();
+                nameTextBox.Clear();
+                amountTextBox.Clear();
+            } else {
+                MessageBox.Show("L'importo deve essere un numero valido.");
+            }
+        }
+
+        private void removeParticipantButton_Click(object sender, EventArgs e) {
+            int indexToRemove = participantsListBox.SelectedIndex;
+            if (indexToRemove >= 0 && indexToRemove < participants.Count) {
+                participants.RemoveAt(indexToRemove);
+                UpdateParticipantsList();
+                UpdateTotalContribution();
+            } else {
+                MessageBox.Show("Seleziona un partecipante dalla lista.");
+            }
+        }
+
+        private void modifyContributionButton_Click(object sender, EventArgs e) {
+            int indexToModify = participantsListBox.SelectedIndex;
+            double newContribution;
+            if (indexToModify >= 0 && indexToModify < participants.Count &&
+                double.TryParse(newAmountTextBox.Text, out newContribution)) {
+                participants[indexToModify].Contribution = newContribution;
+                UpdateParticipantsList();
+                UpdateTotalContribution();
+            } else {
+                MessageBox.Show("Seleziona un partecipante dalla lista e inserisci un importo valido.");
+            }
+        }
+
+        private void UpdateParticipantsList() {
+            participantsListBox.Items.Clear();
+            foreach (Participant participant in participants) {
+                participantsListBox.Items.Add(participant);
+            }
+        }
+
+        private void UpdateTotalContribution() {
+            double total = 0;
+            foreach (Participant participant in participants) {
+                total += participant.Contribution;
+            }
+            totalContributionLabel.Text = $"Totale: {total}";
+        }
+    }
+
+    class Participant {
+        public string Name { get; set; }
+        public double Contribution { get; set; }
+
+        public override string ToString() {
+            return $"{Name} - {Contribution}";
+        }
+    }
+}
